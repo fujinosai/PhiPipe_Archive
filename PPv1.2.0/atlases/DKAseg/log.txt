@@ -1,0 +1,13 @@
+--------------------------------------------------------------------
+Cortical and subcortical labels from DK and Aseg Atlas in FreeSurfer 
+
+References:
+
+1. Desikan, R.S., et al., An automated labeling system for subdividing the human cerebral cortex on MRI scans into gyral based regions of interest. Neuroimage, 2006. 31(3): p. 968-80.
+
+2. Fischl, B.S., et al., Whole Brain Segmentation: Automated Labeling of Neuroanatomical Structures in the Human Brain. Neuron, 2002. 33: p. 341-355.
+
+3. https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation
+
+4. https://surfer.nmr.mgh.harvard.edu/fswiki/SubcorticalSegmentation
+--------------------------------------------------------------------

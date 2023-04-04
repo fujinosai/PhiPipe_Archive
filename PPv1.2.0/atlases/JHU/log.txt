@@ -1,0 +1,11 @@
+-------------------------------------------------------------------
+The JHU white matter label and tract atlas was from FSL's built-in atlases. Of note, there were 48 regions for JHU label atlas in FSL's version while there were 50 regions in the original paper (Mori et al., 2008). And I don't know why: https://www.jiscmail.ac.uk/cgi-bin/wa-jisc.exe?A2=ind2007&L=FSL&P=R80531 
+
+References
+
+1. Mori, S., et al., Stereotaxic white matter atlas based on diffusion tensor imaging in an ICBM template. Neuroimage, 2008. 40(2): p. 570-582.
+
+2. Hua, K., et al., Tract probability maps in stereotaxic spaces: analyses of white matter anatomy and tract-specific quantification. Neuroimage, 2008. 39(1): p. 336-47.
+
+3. https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Atlases
+-------------------------------------------------------------------

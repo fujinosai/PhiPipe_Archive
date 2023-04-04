@@ -1,0 +1,103 @@
+<HTML>
+<TITLE>weProMRI UserGuide</TITLE>
+<HEAD><meta charset="utf-8"/></HEAD>
+<BODY>
+<h1>一、网站使用流程</h1>
+<ol>
+<li>注册（需管理员审核通过）并登录账号</li>
+<li>选择新建项目并设置项目名称</li>
+<li>选择数据类型并设置相应参数</li>
+
+<p>对于BOLD fMRI数据需要设置重复时间(TR，单位为秒)和扫描顺序（Slice Timing）。扫描顺序共支持6种类型（假设采集方向是Z轴，从下到上为正方向）：seqplus（从下到上，顺序扫描）、seqminus（从上到下，顺序扫描）、altplus（从下到上，间隔扫描）、atlplus2（从下到上，间隔扫描，从第二层开始）、altminus（从上到下，间隔扫描）、altminus2（从上到下，间隔扫描，从倒数第二层开始）。对于multi-band扫描，选择none。</p>
+
+<p>对于DWI数据需要设置相位编码方向（一般为Y轴方向）和是否进行概率性纤维束追踪（需要24-48个小时）。</p>
+
+<li>上传数据并提交</li>
+
+<p>上传文件需为nifti格式（nii/nii.gz），dicom格式到nifti格式的转换推荐使用<a href=https://github.com/rordenlab/dcm2nii>dcm2niix</a>。对于DWI数据需上传b-value和b-vector文件。</p>
+
+<li>查看数据分析质量并下载数据</li>
+
+<p>在质量控制界面，可以查看T1像的脑提取、白质分割、脑室分割、全脑分区和配准的截面图；可以查看BOLD fMRI图像的头动、全脑mask、白质mask、脑室mask、分区mask、配准的截面图；可以查看DWI图像的全脑mask、分区mask和配准的截面图。</p>
+
+<p>在数据下载界面，可以下载所有模态的所有分析结果（包括日志文件）和分区结果（可直接用于统计分析）。</p>
+</ol>
+
+<h1>二、数据处理步骤</h1>
+
+<h2>对于T1加权像</h2>
+<ol>
+<li>使用FreeSurfer（recon-all流程）进行脑提取、组织分割、皮层重建和脑区标记等；</li>
+<li>根据FreeSurfer处理的结果，生成全脑、灰质、白质、脑室的图片，用于质量检查；</li>
+<li>根据DK+Aseg分区模板提取不同脑区的皮层厚度、面积、体积和皮层下结构的体积；</li>
+<li>将脑提取后的图像非线性配准到MNI152模板上，用于后续BOLD fMRI或DWI图像的分析。</li>
+</ol>
+
+<h2>对于BOLD fMRI图像</h2>
+<ol>
+<li>去掉前5个时间点数据；</li>
+<li>头动校正，并生成衡量头动大小的指标；</li>
+<li>时间层校正；</li>
+<li>将中间时间点图像与T1加权像对齐；</li>
+<li>检测头动离群点并用相邻时间点插值（Motion Censoring）；</li>
+<li>噪声回归，噪声信号包括白质、脑室的平均信号和头动参数模型；</li>
+<li>滤波0.01-0.1Hz；</li> 
+<li>将全局信号的均值调整为10000；</li>
+<li>将图像转换到MNI152空间（结合T1加权像的配准结果）；</li>
+<li>根据DK+Aseg分区模板计算所有脑区的相关矩阵；</li>
+<li>计算ReHo指标，并根据DK+Aseg分区模板提取所有脑区的ReHo均值；</li>
+<li>计算ALFF/fALFF指标，并根据DK+Aseg分区模板提取所有脑区的ALFF/fALFF均值。</li>
+</ol>
+
+<h2>对于DWI图像</h2>
+<ol>
+<li>将b0图像与T1加权像对齐；</li>
+<li>涡流、头动校正、检测和替换离群值；</li>
+<li>拟合DTI模型并计算FA/MD/AD/RD指标；</li>
+<li>根据JHU白质分区模板提取不同结构和纤维束的FA/MD/AD/RD均值；</li>
+<li>使用DK+Aseg分区模板进行概率性纤维束追踪，生成全脑的连接概率矩阵。</li>
+</ol>
+
+<h1>三、下载文件含义</h1>
+
+<h2>对于T1加权像</h2>
+
+<h3>分析结果保存在t1_proc目录下:</h3>
+
+<p>freesurfer子目录包含FreeSurfer的recon-all流程生成的默认文件，更多FreeSurfer的内容参见<a href=https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferWiki>FreeSurfer Wiki</a>。</p>
+
+<p>masks子目录包含根据FreeSurfer结果派生出的一些文件，包括偏差场校正后的文件（t1_biascorrect.nii.gz）、脑提取后的文件和mask文件（t1_brain.nii.gz/t1_brainmask.nii.gz）、白质的mask文件（t1_wmmask.nii.gz）、脑室的mask文件（t1_csfmask.nii.gz）以及DK+Aseg Atlas的分区文件（t1_DKAseg.nii.gz）。此外，还包括上述文件的截面图，可以用于简单检查FreeSurfer处理数据的质量。关于DK Atlas和Aseg Atlas的详细信息请参见<a  href=https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation>FreeSurfer DK Atlas Wiki</a>和<a href=http://www.freesurfer.net/fswiki/SubcorticalSegmentation>FreeSurfer Aseg Atlas Wiki</a>。</p>
+	
+<p>stats子目录包含根据FreeSurfer结果提取的DK Atlas的皮层厚度（DK_*h_thickness.txt）、面积（DK_*h_area.txt）、体积（DK_*h_volume.txt）以及Aseg Atlas皮下结构的体积（Aseg_volume.txt）。</p>
+
+<p>reg子目录包含T1加权像到MNI152标准模板的线性配准文件（t12mni.mat）、非线性配准文件（t12mni_warp.nii.gz/t12mni_inversewarp.nii.gz）、转换后的文件（t12mni_warped.nii.gz/t12mni_inversewarped.nii.gz）以及用于质量检查的截面图（t12mni.png）。因为这个配准结果用于BOLD fMRI或DWI后续分析，因此如果只提供T1像，就没有该文件夹。配准使用的是ANTs软件，更多关于ANTs的信息参见<a href=https://github.com/ANTsX/ANTs>ANTs官网</a>。</p>
+
+<h2>对于BOLD fMRI加权像</h2>
+<h3>分析结果保存在bold_proc目录下:</h3>
+
+<p>motion子目录包含头动校正后的文件（bold_mc.nii.gz）、头动校正参考文件（中间时间点图像，bold_ref.nii.gz）、头动校正后得到的参数文件（bold_mc.par）、根据头动参数文件计算得到的framewise displacement（FD）指标（bold_mc.fd）和26个参数的头动模型（bold_mc.model）、以FD=0.5mm为阈值得到的头动离群点（bold_mc.censor）、用于衡量头动大小（数据质量）的指标（bold_mc.metric）以及用于可视化检查的图片（bold_motion.png）。其中衡量头动大小的指标包括：最大转动（MaxRot, 单位degree）、最大平移（MaxTrans，单位mm）、平均FD（Mean FD，单位mm）、离群点比例（OutlierRatio）。头动校正使用的软件是FSL的mcflirt，更多信息参见<a href=https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/>FSL Wiki</a>。</p>
+
+<p>native子目录包含一些位于个体空间的文件，包括时间层校正后的文件（bold_st.nii.gz）、噪声回归和滤波后的文件（bold_res.nii.gz）、噪声回归但是没有滤波的文件（用于计算ALFF/fALFF指标，bold_nonfilt.nii.gz）、全局均值调整后的文件（bold_gms.nii.gz）、ReHo指标（bold_reho.nii.gz, 27个Neighbour并转换为Z-score）、ALFF/fALFF指标（bold_alff.nii.gz/bold_falff.nii.gz, 频段0.01-0.1Hz，并转换为Z-score）。时间层校正使用的是AFNI的3dTshift，去除头动离群点、噪声回归和滤波使用的是AFNI的3dTproject，ReHo使用AFNI的3dReHo计算，ALFF/fALFF使用AFNI的3dRSFC计算。</p>
+
+<p>reg子目录包含中间时间点BOLD图像到T1加权像的线性配准文件（bold2t1.mat）和转换以后的文件（bold2t1_warped.nii.gz），以及用于配准质量检查的图片（bold2t1.png）。BOLD图像到T1加权像的配准使用的是FreeSurfer的基于边界的配准方法和bbregister。</p>
+
+<p>masks子目录包含BOLD fMRI图像的全脑mask文件（bold_brainmask.nii.gz）、白质mask文件（bold_wmmask.nii.gz）、脑室mask文件（bold_csfmask.nii.gz）、DK+Aseg分区文件（bold_DKAseg.nii.gz）以及相应的截面图用于质量检查。此外，还包括白质和脑室的平均信号（bold_wmmean.txt/bold_csfmean.txt），用于后续噪声回归。</p>
+
+<p>mni子目录包含一些位于MNI152空间的文件，包括BOLD图像文件以及截面图（bold_std.nii.gz/bold2mni.png）、ReHo文件（bold_stdreho.nii.gz）、ALFF/fALFF文件（bold_stdalff.nii.gz/bold_stdfalff.nii.gz）。图像分辨率为3*3*3mm<sup>3</sup>，因为考虑到一般BOLD fMRI图像的分辨率在3mm左右。</p>
+
+<p>stats子目录包含三个目录，roicc目录包含DK+Aseg分区的平均时间序列（bold_DKAseg.mean）、ROI信息（bold_DKAseg.info）、相关矩阵（bold_DKAseg.roicc）；reho目录包含DK+Aseg分区的平均ReHo（bold_DKAseg_reho.mean）、ROI信息（bold_DKAseg_reho.info）；alff目录包含DK+Aseg分区的平均ALFF/fALFF（bold_DKAseg_alff.mean/ bold_DKAseg_falff.mean）、ROI信息（bold_DKAseg_alff.info/bold_DKAseg_falff.info）。ROI信息包含每个ROI区域的编号、名称、总的体素个数（Nvol）、当前数据缺失的体素个数（Nzero）以及覆盖比例（frac）。因为BOLD fMRI或者DWI图像有一些脑区常出现信号缺失，因此通过查看ROI覆盖比例，选择是否对这些ROI进行分析。</p>
+
+<h2>对于DWI像</h2>
+<h3>分析结果保存在dwi_proc目录下:</h3>
+
+<p>reg子目录包含B0图像（默认第一个图像b值为0）到T1加权像的线性配准文件（dwi2t1.mat）和转换以后的文件（dwi2t1_warped.nii.gz），以及用于配准质量检查的图片（dwi2t1.png）。DWI图像到T1加权像的配准使用的是FreeSurfer的基于边界的配准方法和bbregister。</p>
+
+<p>masks子目录包含DWI图像的全脑mask文件（dwi_brainmask.nii.gz）、DK+Aseg分区文件（dwi_DKAseg.nii.gz）以及相应的截面图用于质量检查。</p>
+
+<p>eddy子目录包含涡流校正、头动校正和离群值替换后的文件（dwi_correct.nii.gz），使用FSL的eddy，更多关于eddy的结果，参见<a href=https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy>FSL Eddy Wiki</a>。</p>
+
+<p>dtifit子目录包含张量模型拟合后得到的FA/MD/AD/RD指标（dwi_FA.nii.gz/dwi_MD.nii.gz/dwi_AD.nii.gz/dwi_RD.nii.gz），以及转换到MNI152空间后的文件（dwi_stdFA.nii.gz/dwi_stdMD.nii.gz/dwi_stdAD.nii.gz/dwi_RD.nii.gz）并生成了FA的截面图用于质量检查。MNI152空间的图像文件的分辨率为2*2*2mm<sup>3</sup>，因为考虑到一般DWI图像的分辨率在2mm左右。如果是multi-shell的数据（多个非0的b值），会自动提取b=0和除b=0以外的最小b值的图像来拟合张量模型；b值变化范围小于100认为是同一b值。</p>
+
+<p>stats子目录两个目录，dti目录包含JHU分区和纤维束的FA/MD/AD/RD均值（dwi_JHUlabelFA.mean/ dwi_JHUtractFA.mean等）、ROI信息（dwi_JHUlabelFA.info/ dwi_JHUtractFA.info）。更多关于JHU Atlas的信息参见<a href=https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Atlases>FSL Atlas Wiki</a> ；probtrackx目录包含根据DK+Aseg分区得到的不同脑区间的白质连接概率矩阵(DKAseg_prob.mat)和ROI信息文件（DKAseg_prob.info）。更多关于概率追踪结果文件的含义请参见<a href=https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/UserGuide>FSL FDT Wiki</a>。</p>
+</BODY>
+</HTML>

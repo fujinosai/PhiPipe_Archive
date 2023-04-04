@@ -1,0 +1,9 @@
+Version: 1.0.0.2020331
+
+Software Requirements:
+FreeSurfer 6.0.0
+FSL 5.0.11/6.0.0
+AFNI 17.2.07/18.3.03
+ANTs 2.2.0
+Convert3D 1.0.0
+R 3.5.2

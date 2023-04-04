@@ -1,0 +1,11 @@
+--------------------------------------------------------------------
+Cortical and subcortical labels from Schaefer2018 and Aseg Atlas in FreeSurfer 
+
+References:
+
+1. Schaefer A, Kong R, Gordon EM, Laumann TO, Zuo XN, Holmes AJ, Eickhoff SB, Yeo BTT. Local-Global parcellation of the human cerebral cortex from intrinsic functional connectivity MRI. Cerebral Cortex, 29:3095-3114, 2018.
+
+2. https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal
+
+3. Fischl, B.S., et al., Whole Brain Segmentation: Automated Labeling of Neuroanatomical Structures in the Human Brain. Neuron, 2002. 33: p. 341-355.
+--------------------------------------------------------------------

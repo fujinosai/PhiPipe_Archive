@@ -1,0 +1,13 @@
+---------------------------------------------------------------
+MNI152_T1_3mm_brain is resampled from FSL's MNI152 2mm template and is the reference space for fMRI analysis.
+This template is also called ICBM 152 non-linear 6th generation asymmetric template.
+Note that the FSL's MNI152 template is asymmetric, which is different from the one released by MNI.
+
+References
+
+1. https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Atlases
+
+2. http://nist.mni.mcgill.ca/?p=858
+
+3. https://www.lead-dbs.org/about-the-mni-spaces/
+---------------------------------------------------------------
